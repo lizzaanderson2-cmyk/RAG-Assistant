@@ -1,0 +1,303 @@
+{
+  "name": "Punjab Board Approved Publications-AI Assistant",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        48
+      ],
+      "id": "3c8ba5f0-c3fc-49d8-b3dc-35ad84496a72",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1yn8aILq6GDPXfAA1bFlBR2q4Q87pX61w",
+          "mode": "list",
+          "cachedResultName": "SRM Punjab.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1yn8aILq6GDPXfAA1bFlBR2q4Q87pX61w/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -336,
+        48
+      ],
+      "id": "31b8ebad-6b01-4f82-9269-82d85f0c057c",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nJ7BYyTZhExmDfFW",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        48
+      ],
+      "id": "9aa5b344-0281-4a9e-9981-3ff14fc16625",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "AvJSHraajBAWw3wn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        240
+      ],
+      "id": "df311fd4-8d4d-40e2-8fda-06907de30866",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        176
+      ],
+      "id": "e0c46560-4d38-43d6-980d-95857bbe4b9e",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "i5lNGrzH8VXvMWGC",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -672,
+        -288
+      ],
+      "id": "61738061-70c9-4704-a991-f3c03b03b900",
+      "name": "When chat message received",
+      "webhookId": "ef5c1715-66f9-4a7f-83ce-b0cbb8c158f4"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an AI assistant designed for private schools in Punjab.\n\nYour task is to answer questions ONLY using the provided\nPunjab Board approved documents stored in the vector database.\n\nAlways include the document name or source from which the answer\nis retrieved. If page information is available, include it in\nthe following format:\nSource: Document Name (Page Number)\n\nIf the information is not found in the documents, respond with:\n\"This information is not available in Punjab Board approved documents.\"\n\nDo not answer general knowledge questions or questions outside\nthe scope of Punjab Board approved publications."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -288,
+        -288
+      ],
+      "id": "59d7d2b3-5d44-4984-82bf-3c079ea1edd9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -112
+      ],
+      "id": "9481ca21-3a15-4653-a8b0-5fe40a242344",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "i5lNGrzH8VXvMWGC",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieve  answer for query from chat input.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "topK": 2,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        -144
+      ],
+      "id": "ae47a8a4-7070-47ad-9e96-39c959e9287e",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "AvJSHraajBAWw3wn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        64
+      ],
+      "id": "ec4ebf77-238d-4b3c-bd73-acbb7e0056b3",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "VPS9jHGaTN5ncDYv",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "6229ab07-05e7-44e2-8122-c2655724d03a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e68a54aead2538b9ea2e1483c8002c85a7a59c968eae89340aa9036c9abded7a"
+  },
+  "id": "_LkPNYCEEzpjeJ_d5k65c",
+  "tags": []
+}
