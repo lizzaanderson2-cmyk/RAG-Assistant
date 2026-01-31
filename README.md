@@ -145,7 +145,7 @@ Demo Video
 
 Watch the AI assistant in action: Demo Video
 
-(Replace with your uploaded video link or GitHub-hosted video file)
+(https://youtu.be/STufqvK6JVo?si=gv9_nvfaWssdBVW_)
 
 
 ---
